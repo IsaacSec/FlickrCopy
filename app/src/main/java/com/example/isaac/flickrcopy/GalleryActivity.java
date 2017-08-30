@@ -17,6 +17,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 import adapter.GalleryAdapter;
@@ -29,6 +30,7 @@ public class GalleryActivity extends AppCompatActivity {
     private GridView gridView;
     private FlickrCall flickr;
     private ArrayList<FlickrPhotoResponse> photos;
+    private ArrayList<Bitmap> images;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +54,7 @@ public class GalleryActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        ArrayList<Bitmap> images = flickr.getPhotoImages(photos);
+        images = flickr.getPhotoImages(photos);
         //ImageView im = new ImageView();
         //im.setImageDrawable(Drawable.createFromStream(images.get(0), null));
         gridView.setAdapter(new GalleryAdapter(this, images));
@@ -60,13 +62,24 @@ public class GalleryActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                Intent infoActivity = new Intent(GalleryActivity.this, GalleryActivity.class);
+                Intent infoActivity = new Intent(GalleryActivity.this, InfoActivity.class);
                 FlickrPhotoResponse photo = photos.get(i);
 
                 infoActivity.putExtra("id",photo.getId());
                 infoActivity.putExtra("secret",photo.getSecret());
                 infoActivity.putExtra("server",photo.getServer());
                 infoActivity.putExtra("farm",photo.getFarm());
+
+                Bitmap b = images.get(i);
+                int bytes = b.getByteCount();
+//or we can calculate bytes this way. Use a different value than 4 if you don't use 32bit images.
+//int bytes = b.getWidth()*b.getHeight()*4;
+
+                ByteBuffer buffer = ByteBuffer.allocate(bytes); //Create a new buffer
+                b.copyPixelsToBuffer(buffer); //Move the byte data to the buffer
+
+                byte[] array = buffer.array();
+                infoActivity.putExtra("image", array);
 
                 startActivity(infoActivity);
             }

@@ -13,6 +13,13 @@ public class FlickrPhotoResponse {
     private String id;
     private String secret;
 
+    public FlickrPhotoResponse(String farm, String server, String id, String secret) {
+        this.farm = farm;
+        this.server = server;
+        this.id = id;
+        this.secret = secret;
+    }
+
     public FlickrPhotoResponse(JSONObject photo) throws JSONException{
         farm = photo.getString("farm");
         server = photo.getString("server");

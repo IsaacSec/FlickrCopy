@@ -40,6 +40,22 @@ public class FlickrCall {
         return null;
     }
 
+    public String getInfoSearchResponse(String photo_id){
+        HttpClient client = new HttpClient();
+        String url = API_URL+Method.PHOTOS_INFO+"&api_key="+API_KEY+"&photo_id="+photo_id+"&nojsoncallback=1";
+        System.out.println("URL:"+url);
+        try {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            String response = client.run(url);
+            System.out.println("Response: "+response);
+            return response;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public ArrayList<FlickrPhotoResponse> getPhotos(String tag) throws JSONException{
         ArrayList<FlickrPhotoResponse> photos = new ArrayList<>();
         JSONObject json = getPhotoSearchResponse(tag);
@@ -80,6 +96,22 @@ public class FlickrCall {
         }
 
         return images;
+    }
+
+    public Bitmap getPhotoImage (String farm, String server, String id, String secret) {
+        Bitmap bmp = null;
+        FlickrPhotoResponse r = new FlickrPhotoResponse(farm,server,id,secret);
+        try {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            HttpClient client = new HttpClient();
+            String url = getImageURL(r);
+            byte[] response = client.runForMedia(url);
+            bmp = BitmapFactory.decodeByteArray(response, 0, response.length);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bmp;
     }
 
     public String getImageURL (FlickrPhotoResponse p){
