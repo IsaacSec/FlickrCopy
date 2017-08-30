@@ -1,6 +1,7 @@
 package api;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -23,4 +24,16 @@ public class HttpClient {
             return response.body().string();
         }
     }
+
+    byte[] runForMedia(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            return response.body().bytes();
+        }
+    }
+
+
 }
