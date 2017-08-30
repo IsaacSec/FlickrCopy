@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -27,7 +28,7 @@ public class GalleryActivity extends AppCompatActivity {
     private TextView category;
     private GridView gridView;
     private FlickrCall flickr;
-    private ArrayList<InputStream> images = new ArrayList<>();
+    private ArrayList<FlickrPhotoResponse> photos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +44,7 @@ public class GalleryActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String text = intent.getStringExtra("category");
         flickr = new FlickrCall();
-        ArrayList<FlickrPhotoResponse> photos = new ArrayList<>();
+        photos = new ArrayList<>();
 
         try {
             photos = flickr.getPhotos(text);
@@ -55,7 +56,21 @@ public class GalleryActivity extends AppCompatActivity {
         //ImageView im = new ImageView();
         //im.setImageDrawable(Drawable.createFromStream(images.get(0), null));
         gridView.setAdapter(new GalleryAdapter(this, images));
-        //gridView.setAdapter(new ImageAdapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                Intent infoActivity = new Intent(GalleryActivity.this, GalleryActivity.class);
+                FlickrPhotoResponse photo = photos.get(i);
+
+                infoActivity.putExtra("id",photo.getId());
+                infoActivity.putExtra("secret",photo.getSecret());
+                infoActivity.putExtra("server",photo.getServer());
+                infoActivity.putExtra("farm",photo.getFarm());
+
+                startActivity(infoActivity);
+            }
+        });
     }
 
     private void initGUIElements(){
